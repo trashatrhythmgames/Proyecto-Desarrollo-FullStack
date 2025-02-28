@@ -1,3 +1,4 @@
+//c:\Users\Home\proyecto\frontend\src\components\CourseList.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import CourseCard from './CourseCard';
@@ -14,7 +15,12 @@ const CourseList = ({ courses, onAddCourse, onEditCourse, onDeleteCourse }) => {
   const handleAddCourse = async (event) => {
     event.preventDefault();
     try {
-      await axios.post('/api/courses', newCourse);
+      //convert the students value to number
+      const courseToAdd = {
+        ...newCourse,
+        students: parseInt(newCourse.students,10)
+      }
+      await axios.post('/api/courses', courseToAdd);
       setNewCourse({ name: '', students: 0, status: 'active' });
       onAddCourse();
     } catch (error) {

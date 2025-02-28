@@ -1,38 +1,110 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { inputStyle, buttonStyle, formStyle } from '../styles/styles';
 import { darkTheme } from '../styles/theme';
+import { buttonStyle, inputStyle, labelStyle, formStyle } from '../styles/styles';
 
 const LoginForm = ({ onLoginSuccess }) => {
-  const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [loginError, setLoginError] = useState('');
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false); // New state for register/login mode
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    setLoginError(''); // Clear any previous error messages
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setMessage(null);
     try {
-      const response = await axios.post('/api/auth/login', loginData); // Corrected line!
-      localStorage.setItem('token', response.data.token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+      const response = await axios.post('/api/auth/login', { email, password }); // Change here
+      const token = response.data.token;
+      localStorage.setItem('token', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       onLoginSuccess();
     } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-      if (error.response && error.response.data && error.response.data.message) {
-        setLoginError(error.response.data.message);
-      } else {
-          setLoginError('Error en el inicio de sesión. Inténtalo de nuevo.');
-      }
+      setError(error.response?.data?.message || 'Login failed');
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setMessage(null);
+    try {
+      const response = await axios.post('/api/auth/register', { username:name, email, password }); //Change here
+      setMessage(response.data.message || 'Register success');
+      setIsRegistering(false); // Switch to login mode after successful registration
+    } catch (error) {
+      setError(error.response?.data?.message || 'Registration failed');
     }
   };
 
   return (
-    <form onSubmit={handleLogin} style={{ ...formStyle, maxWidth: '400px', margin: 'auto' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Iniciar Sesión</h2>
-      {loginError && <p style={{ color: darkTheme.danger, textAlign: 'center' }}>{loginError}</p>}
-      <input type="email" name="email" placeholder="Email" value={loginData.email} onChange={(e) => setLoginData({ ...loginData, email: e.target.value })} style={{ ...inputStyle, background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }} />
-      <input type="password" name="password" placeholder="Contraseña" value={loginData.password} onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} style={{ ...inputStyle, background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }} />
-      <button type="submit" style={{ ...buttonStyle, backgroundColor: darkTheme.primary, width: '100%', justifyContent: 'center' }}>Iniciar Sesión</button>
-    </form>
+    <div style={{ background: darkTheme.background, color: darkTheme.textPrimary, padding: '20px', borderRadius: '10px', width: '300px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px' }}>
+        <button
+          onClick={() => setIsRegistering(false)}
+          style={{
+            ...buttonStyle,
+            backgroundColor: !isRegistering ? darkTheme.primary : darkTheme.secondary, // Changed here
+            borderColor: !isRegistering ? darkTheme.primary : darkTheme.secondary,  // Added border color for better look
+          }}
+        >
+          Login
+        </button>
+        <button
+          onClick={() => setIsRegistering(true)}
+          style={{
+            ...buttonStyle,
+            backgroundColor: isRegistering ? darkTheme.primary : darkTheme.secondary, // Changed here
+            borderColor: isRegistering ? darkTheme.primary : darkTheme.secondary, // Added border color for better look
+          }}
+        >
+          Register
+        </button>
+      </div>
+      {error && <div style={{ color: darkTheme.danger }}>{error}</div>}
+      {message && <div style={{ color: darkTheme.success }}>{message}</div>}
+      <form onSubmit={isRegistering ? handleRegister : handleLogin} style={formStyle}>
+        {isRegistering && (
+          <>
+            <label htmlFor="username" style={labelStyle}>Username:</label>
+            <input
+              type="text"
+              id="username"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              style={inputStyle}
+            />
+          </>
+        )}
+
+          <label htmlFor="email" style={labelStyle}>Email:</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={inputStyle}
+          />
+
+        <label htmlFor="password" style={labelStyle}>Password:</label>
+        <input
+          type="password"
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          style={inputStyle}
+        />
+
+        <button type="submit" style={{ ...buttonStyle, width: '100%', backgroundColor: darkTheme.primary}}> {/* Changed here */}
+          {isRegistering ? 'Register' : 'Login'}
+        </button>
+      </form>
+    </div>
   );
 };
 

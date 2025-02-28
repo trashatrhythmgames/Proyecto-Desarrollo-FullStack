@@ -9,10 +9,6 @@ const studentSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true
-    },
-    courses: {
-        type: Number,
-        default: 0
     }
 }, { timestamps: true });
 

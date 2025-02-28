@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const authController = {
   register: async (req, res) => {
     try {
-      const { name, email, password } = req.body;
+      const { username, email, password } = req.body;
       
       // Verificar si el usuario ya existe
       const existingUser = await User.findOne({ email });
@@ -19,7 +19,7 @@ const authController = {
 
       // Crear nuevo usuario
       const newUser = new User({
-        name,
+        username,
         email,
         password: hashedPassword
       });
@@ -59,7 +59,7 @@ const authController = {
         token, 
         user: { 
           id: user._id, 
-          name: user.name, 
+          username: user.username, 
           email: user.email 
         } 
       });
