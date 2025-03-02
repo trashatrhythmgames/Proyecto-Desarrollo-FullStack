@@ -1,79 +1,74 @@
-//c:\Users\Home\proyecto\backend\controllers\courseController.js
 const Course = require('../models/Course');
 
-const courseController = {
-    getAllCourses: async (req, res) => {
-        try {
-            const courses = await Course.find();
-            res.json(courses);
-        } catch (error) {
-            console.error('Error getting courses:', error);
-            res.status(500).json({ message: 'Error getting courses', error: error.message });
-        }
-    },
+const getAllCourses = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search = '' } = req.query;
+    const parsedPage = parseInt(page, 10);
+    const parsedLimit = parseInt(limit, 10);
 
-    createCourse: async (req, res) => {
-        try {
-            const { name, students, status } = req.body; //added students and status
+    const skip = (parsedPage - 1) * parsedLimit;
 
-            const existingCourse = await Course.findOne({ name });
-            if (existingCourse) {
-                return res.status(400).json({ message: 'Course already exists' });
-            }
+    const filter = search ? { name: { $regex: search, $options: 'i' } } : {};
 
-            const newCourse = new Course({ name, students, status });//added students and status
+    const courses = await Course.find(filter).skip(skip).limit(parsedLimit);
 
-            await newCourse.save();
-            res.status(201).json({ message: 'Course created successfully', course: newCourse });
-        } catch (error) {
-            console.error('Error creating course:', error);
-            res.status(500).json({ message: 'Error creating course', error: error.message });
-        }
-    },
+    // Calculate the total number of courses that match the filter
+    const totalCourses = await Course.countDocuments(filter);
 
-    updateCourse: async (req, res) => {
-        try {
-            const { name, students, status } = req.body;
-            const courseId = req.params.id;
-
-            const existingCourse = await Course.findOne({ name });
-            if (existingCourse && existingCourse._id.toString() !== courseId.toString()) {
-                return res.status(400).json({ message: 'Course already exists' });
-            }
-
-            const course = await Course.findByIdAndUpdate(
-                courseId,
-                { name, students, status },
-                { new: true }
-            );
-
-            if (!course) {
-                return res.status(404).json({ message: 'Course not found' });
-            }
-
-            res.status(200).json({ message: 'Course updated successfully', course });
-        } catch (error) {
-            console.error('Error updating course:', error);
-            res.status(500).json({ message: 'Error updating course', error: error.message });
-        }
-    },
-
-    deleteCourse: async (req, res) => {
-        try {
-            const courseId = req.params.id;
-
-            const course = await Course.findById(courseId);
-            if (!course) {
-                return res.status(404).json({ message: 'Course not found' });
-            }
-
-            await Course.findByIdAndDelete(courseId);
-            res.status(200).json({ message: 'Course deleted successfully' });
-        } catch (error) {
-            console.error('Error deleting course:', error);
-            res.status(500).json({ message: 'Error deleting course', error: error.message });
-        }
-    }
+    res.json({
+      courses: courses,
+      total: totalCourses,
+      currentPage: parsedPage,
+      totalPages: Math.ceil(totalCourses / parsedLimit)
+    });
+  } catch (error) {
+    console.error('Error getting courses:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
-module.exports = courseController;
+const createCourse = async (req, res) => {
+  try {
+    const newCourse = new Course(req.body);
+    await newCourse.save();
+    res.status(201).json(newCourse);
+  } catch (error) {
+    console.error('Error creating course:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const updateCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedCourse = await Course.findByIdAndUpdate(id, req.body, { new: true });
+    if (!updatedCourse) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    res.json(updatedCourse);
+  } catch (error) {
+    console.error('Error updating course:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const deleteCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedCourse = await Course.findByIdAndDelete(id);
+    if (!deletedCourse) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    res.json({ message: 'Course deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting course:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = {
+  getAllCourses,
+  createCourse,
+  updateCourse,
+  deleteCourse,
+};

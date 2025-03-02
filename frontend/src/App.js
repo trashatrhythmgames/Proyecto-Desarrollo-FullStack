@@ -24,6 +24,15 @@ const App = () => {
   const [editingStudentId, setEditingStudentId] = useState(null);
   const [editedStudent, setEditedStudent] = useState({ name: '', email: '' });
   const [error, setError] = useState(null);
+  //pagination and filter states
+  const [coursePage, setCoursePage] = useState(1);
+  const [courseLimit, setCourseLimit] = useState(10);
+  const [courseSearch, setCourseSearch] = useState('');
+
+  const [studentPage, setStudentPage] = useState(1);
+  const [studentLimit, setStudentLimit] = useState(10);
+  const [studentSearch, setStudentSearch] = useState('');
+  
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -43,10 +52,20 @@ const App = () => {
 
   const fetchCourses = async () => {
     try {
-      const response = await axios.get('/api/courses');
+      const response = await axios.get('/api/courses', {
+        params: {
+          page: coursePage,
+          limit: courseLimit,
+          search: courseSearch,
+        },
+      });
       // Map _id to id here
-      const coursesWithId = response.data.map(course => ({ ...course, id: course._id }));
+      const coursesWithId = response.data.courses.map(course => ({ ...course, id: course._id }));
       setCourses(coursesWithId);
+      // You can now access total, currentPage and totalPages
+      console.log('Total courses:', response.data.total);
+      console.log('Current page:', response.data.currentPage);
+      console.log('Total pages:', response.data.totalPages);
     } catch (error) {
       setError('Error obteniendo cursos:', error);
       console.error(error);
@@ -55,10 +74,20 @@ const App = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get('/api/students');
+      const response = await axios.get('/api/students', {
+        params: {
+          page: studentPage,
+          limit: studentLimit,
+          search: studentSearch,
+        },
+      });
       // Map _id to id here
-      const studentsWithId = response.data.map(student => ({ ...student, id: student._id }));
+      const studentsWithId = response.data.students.map(student => ({ ...student, id: student._id }));
       setStudents(studentsWithId);
+      // You can now access total, currentPage and totalPages
+      console.log('Total students:', response.data.total);
+      console.log('Current page:', response.data.currentPage);
+      console.log('Total pages:', response.data.totalPages);
     } catch (error) {
       setError('Error obteniendo estudiantes:', error);
       console.error(error);
@@ -139,6 +168,42 @@ const App = () => {
     delete axios.defaults.headers.common['Authorization'];
   };
 
+  //pagination and filter handlers
+  const handleCoursePageChange = (newPage) => {
+    setCoursePage(newPage);
+  };
+
+  const handleCourseLimitChange = (newLimit) => {
+    setCourseLimit(newLimit);
+    setCoursePage(1);
+  };
+
+  const handleCourseSearchChange = (newSearch) => {
+    setCourseSearch(newSearch);
+    setCoursePage(1);
+  };
+  const handleStudentPageChange = (newPage) => {
+    setStudentPage(newPage);
+  };
+
+  const handleStudentLimitChange = (newLimit) => {
+    setStudentLimit(newLimit);
+    setStudentPage(1);
+  };
+
+  const handleStudentSearchChange = (newSearch) => {
+    setStudentSearch(newSearch);
+    setStudentPage(1);
+  };
+  // refetch data when page, limit or search changes
+  useEffect(() => {
+    fetchCourses();
+  }, [coursePage, courseLimit, courseSearch]);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [studentPage, studentLimit, studentSearch]);
+
   return (
     <div style={{ padding: '2rem', color: darkTheme.textPrimary, background: darkTheme.background, minHeight: '100vh' }}>
       {error && <p>{error}</p>}
@@ -153,21 +218,61 @@ const App = () => {
             </button>
           </div>
           {activeTab === 'courses' && (
-            <CourseList
-              courses={courses}
-              onAddCourse={fetchCourses}
-              onEditCourse={handleEditCourse}
-              onDeleteCourse={openDeleteModal}
-            />
+            <>
+              <div style={{display: "flex", justifyContent: 'space-between', marginBottom: '1rem'}}>
+                <div>
+                    <label htmlFor="courseSearch">Buscar por Nombre: </label>
+                    <input type="text" id="courseSearch" value={courseSearch} onChange={(e) => handleCourseSearchChange(e.target.value)} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }} />
+                </div>
+                <div>
+                    <label htmlFor="courseLimit">Límite por página:</label>
+                    <select id="courseLimit" value={courseLimit} onChange={(e) => handleCourseLimitChange(parseInt(e.target.value))} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }}>
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                    </select>
+                </div>
+                <div>
+                    <label htmlFor="coursePage">Página:</label>
+                    <input type="number" id="coursePage" value={coursePage} onChange={(e) => handleCoursePageChange(parseInt(e.target.value))} min="1" style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary, width: '50px' }} />
+                </div>
+              </div>
+              <CourseList
+                courses={courses}
+                onAddCourse={fetchCourses}
+                onEditCourse={handleEditCourse}
+                onDeleteCourse={openDeleteModal}
+              />
+            </>
           )}
 
           {activeTab === 'students' && (
-            <StudentList
-              students={students}
-              onAddStudent={fetchStudents}
-              onEditStudent={handleEditStudent}
-              onDeleteStudent={openDeleteModal}
-            />
+            <>
+              <div style={{display: "flex", justifyContent: 'space-between', marginBottom: '1rem'}}>
+                <div>
+                    <label htmlFor="studentSearch">Buscar por Nombre o Email: </label>
+                    <input type="text" id="studentSearch" value={studentSearch} onChange={(e) => handleStudentSearchChange(e.target.value)} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }} />
+                </div>
+                <div>
+                    <label htmlFor="studentLimit">Límite por página:</label>
+                    <select id="studentLimit" value={studentLimit} onChange={(e) => handleStudentLimitChange(parseInt(e.target.value))} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }}>
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                    </select>
+                </div>
+                <div>
+                    <label htmlFor="studentPage">Página:</label>
+                    <input type="number" id="studentPage" value={studentPage} onChange={(e) => handleStudentPageChange(parseInt(e.target.value))} min="1" style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary, width: '50px' }} />
+                </div>
+              </div>
+              <StudentList
+                students={students}
+                onAddStudent={fetchStudents}
+                onEditStudent={handleEditStudent}
+                onDeleteStudent={openDeleteModal}
+              />
+            </>
           )}
         </div>
       )}
