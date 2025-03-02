@@ -11,8 +11,7 @@ const CurrencyConverter = () => {
   const [currencies, setCurrencies] = useState([]);
   const [error, setError] = useState(null);
 
-  // Replace with your API key
-  const API_KEY = 'fca_live_y0XaICoViiEAWVQTG9ywpXsrBpacJZLnU2Qa0V8U'; // Replace with your actual API key
+  const API_KEY = 'fca_live_y0XaICoViiEAWVQTG9ywpXsrBpacJZLnU2Qa0V8U';
 
   useEffect(() => {
     const fetchCurrencies = async () => {

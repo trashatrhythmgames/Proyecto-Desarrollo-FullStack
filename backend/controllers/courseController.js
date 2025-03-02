@@ -5,7 +5,6 @@ const getAllCourses = async (req, res) => {
     let { page = 1, limit = 10, search = '' } = req.query;
     let parsedPage = parseInt(page, 10);
     const parsedLimit = parseInt(limit, 10);
-    // Ensure that the parsedPage is not less than 1
     if (parsedPage < 1){
       parsedPage = 1;
     }
@@ -16,7 +15,6 @@ const getAllCourses = async (req, res) => {
 
     const courses = await Course.find(filter).skip(skip).limit(parsedLimit);
 
-    // Calculate the total number of courses that match the filter
     const totalCourses = await Course.countDocuments(filter);
 
     res.json({

@@ -1,4 +1,3 @@
-//c:\Users\Home\proyecto\frontend\src\components\CourseList.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import CourseCard from './CourseCard';
@@ -15,7 +14,6 @@ const CourseList = ({ courses, onAddCourse, onEditCourse, onDeleteCourse }) => {
   const handleAddCourse = async (event) => {
     event.preventDefault();
     try {
-      //convert the students value to number
       const courseToAdd = {
         ...newCourse,
         students: parseInt(newCourse.students,10)

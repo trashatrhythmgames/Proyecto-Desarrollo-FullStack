@@ -9,13 +9,9 @@ import EditStudentModal from './components/EditStudentModal';
 import Tabs from './components/Tabs';
 import { darkTheme } from './styles/theme';
 import { buttonStyle } from './styles/styles';
-// Import the new component
 import CurrencyConverter from './components/CurrencyConverter';
 
 const App = () => {
-  // Remove unused activeTab
-  //const [activeTab, setActiveTab] = useState('login');
-  // Keep only activeAppTab
   const [activeAppTab, setActiveAppTab] = useState('courses');
   const [courses, setCourses] = useState([]);
   const [students, setStudents] = useState([]);
@@ -29,7 +25,6 @@ const App = () => {
   const [editingStudentId, setEditingStudentId] = useState(null);
   const [editedStudent, setEditedStudent] = useState({ name: '', email: '' });
   const [error, setError] = useState(null);
-  //pagination and filter states
   const [coursePage, setCoursePage] = useState(1);
   const [courseLimit, setCourseLimit] = useState(10);
   const [courseSearch, setCourseSearch] = useState('');
@@ -47,13 +42,11 @@ const App = () => {
           search: courseSearch,
         },
       });
-      // Map _id to id here
       const coursesWithId = response.data.courses.map((course) => ({
         ...course,
         id: course._id,
       }));
       setCourses(coursesWithId);
-      // You can now access total, currentPage and totalPages
       console.log('Total courses:', response.data.total);
       console.log('Current page:', response.data.currentPage);
       console.log('Total pages:', response.data.totalPages);
@@ -72,13 +65,11 @@ const App = () => {
           search: studentSearch,
         },
       });
-      // Map _id to id here
       const studentsWithId = response.data.students.map((student) => ({
         ...student,
         id: student._id,
       }));
       setStudents(studentsWithId);
-      // You can now access total, currentPage and totalPages
       console.log('Total students:', response.data.total);
       console.log('Current page:', response.data.currentPage);
       console.log('Total pages:', response.data.totalPages);
@@ -99,9 +90,6 @@ const App = () => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setIsLoggedIn(true);
       fetchData();
-      //Remove call to set activeTab
-      //setActiveTab("courses");
-      //set default to the courses tab.
       setActiveAppTab('courses');
     }
   }, [fetchData]);
@@ -186,15 +174,10 @@ const App = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
-    //Remove call to set activeTab
-    //setActiveTab('login');
-      //set default to the courses tab.
     setActiveAppTab('courses');
-    // Clear axios default header
     delete axios.defaults.headers.common['Authorization'];
   };
 
-  //pagination and filter handlers
   const handleCoursePageChange = (newPage) => {
     if (newPage < 1) {
       newPage = 1;
@@ -227,7 +210,6 @@ const App = () => {
     setStudentSearch(newSearch);
     setStudentPage(1);
   };
-  // refetch data when page, limit or search changes
   useEffect(() => {
     fetchCourses();
   }, [fetchCourses]);

@@ -7,7 +7,7 @@ const LoginForm = ({ onLoginSuccess }) => {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false); // New state for register/login mode
+  const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
 
@@ -16,7 +16,7 @@ const LoginForm = ({ onLoginSuccess }) => {
     setError(null);
     setMessage(null);
     try {
-      const response = await axios.post('/api/auth/login', { email, password }); // Change here
+      const response = await axios.post('/api/auth/login', { email, password });
       const token = response.data.token;
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -31,9 +31,9 @@ const LoginForm = ({ onLoginSuccess }) => {
     setError(null);
     setMessage(null);
     try {
-      const response = await axios.post('/api/auth/register', { username:name, email, password }); //Change here
+      const response = await axios.post('/api/auth/register', { username:name, email, password });
       setMessage(response.data.message || 'Register success');
-      setIsRegistering(false); // Switch to login mode after successful registration
+      setIsRegistering(false);
     } catch (error) {
       setError(error.response?.data?.message || 'Registration failed');
     }
@@ -46,8 +46,8 @@ const LoginForm = ({ onLoginSuccess }) => {
           onClick={() => setIsRegistering(false)}
           style={{
             ...buttonStyle,
-            backgroundColor: !isRegistering ? darkTheme.primary : darkTheme.secondary, // Changed here
-            borderColor: !isRegistering ? darkTheme.primary : darkTheme.secondary,  // Added border color for better look
+            backgroundColor: !isRegistering ? darkTheme.primary : darkTheme.secondary,
+            borderColor: !isRegistering ? darkTheme.primary : darkTheme.secondary,
           }}
         >
           Login
@@ -56,8 +56,8 @@ const LoginForm = ({ onLoginSuccess }) => {
           onClick={() => setIsRegistering(true)}
           style={{
             ...buttonStyle,
-            backgroundColor: isRegistering ? darkTheme.primary : darkTheme.secondary, // Changed here
-            borderColor: isRegistering ? darkTheme.primary : darkTheme.secondary, // Added border color for better look
+            backgroundColor: isRegistering ? darkTheme.primary : darkTheme.secondary,
+            borderColor: isRegistering ? darkTheme.primary : darkTheme.secondary,
           }}
         >
           Register

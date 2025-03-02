@@ -6,7 +6,6 @@ const getAllStudents = async (req, res) => {
     let parsedPage = parseInt(page, 10);
     const parsedLimit = parseInt(limit, 10);
 
-    // Ensure that the parsedPage is not less than 1
     if (parsedPage < 1){
       parsedPage = 1;
     }
@@ -16,7 +15,7 @@ const getAllStudents = async (req, res) => {
     const filter = search
       ? {
           $or: [
-            { name: { $regex: search, $options: 'i' } }, // Case-insensitive search
+            { name: { $regex: search, $options: 'i' } },
             { email: { $regex: search, $options: 'i' } },
           ],
         }
@@ -24,7 +23,6 @@ const getAllStudents = async (req, res) => {
 
     const students = await Student.find(filter).skip(skip).limit(parsedLimit);
 
-    // Calculate the total number of students that match the filter
     const totalStudents = await Student.countDocuments(filter);
 
     res.json({
