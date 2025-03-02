@@ -9,9 +9,14 @@ import EditStudentModal from './components/EditStudentModal';
 import Tabs from './components/Tabs';
 import { darkTheme } from './styles/theme';
 import { buttonStyle } from './styles/styles';
+// Import the new component
+import CurrencyConverter from './components/CurrencyConverter';
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState('login');
+  // Remove unused activeTab
+  //const [activeTab, setActiveTab] = useState('login');
+  // Keep only activeAppTab
+  const [activeAppTab, setActiveAppTab] = useState('courses');
   const [courses, setCourses] = useState([]);
   const [students, setStudents] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -33,7 +38,7 @@ const App = () => {
   const [studentLimit, setStudentLimit] = useState(10);
   const [studentSearch, setStudentSearch] = useState('');
 
-    const fetchCourses = useCallback(async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       const response = await axios.get('/api/courses', {
         params: {
@@ -94,7 +99,10 @@ const App = () => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setIsLoggedIn(true);
       fetchData();
-      setActiveTab("courses");
+      //Remove call to set activeTab
+      //setActiveTab("courses");
+      //set default to the courses tab.
+      setActiveAppTab('courses');
     }
   }, [fetchData]);
 
@@ -109,7 +117,10 @@ const App = () => {
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     fetchData();
-    setActiveTab('courses');
+    //Remove call to set activeTab
+    //setActiveTab('courses');
+      //set default to the courses tab.
+    setActiveAppTab('courses');
   };
 
   const openDeleteModal = (type, id) => {
@@ -175,7 +186,10 @@ const App = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
-    setActiveTab('login');
+    //Remove call to set activeTab
+    //setActiveTab('login');
+      //set default to the courses tab.
+    setActiveAppTab('courses');
     // Clear axios default header
     delete axios.defaults.headers.common['Authorization'];
   };
@@ -230,12 +244,17 @@ const App = () => {
       ) : (
         <div>
           <div style={{ display: 'flex', justifyContent: "space-between", alignItems: 'center', marginBottom: "1rem" }}>
-            <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+            {/*change to use the activeAppTab*/}
+            <Tabs activeTab={activeAppTab} setActiveTab={setActiveAppTab} />
             <button onClick={handleLogout} style={{ ...buttonStyle, backgroundColor: darkTheme.danger }}>
               Cerrar Sesión
             </button>
           </div>
-          {activeTab === 'courses' && (
+          {/*add a new conditional to show or not the new currency converter*/}
+          {activeAppTab === 'currency' && (
+            <CurrencyConverter />
+          )}
+          {activeAppTab === 'courses' && (
             <>
               <div style={{ display: "flex", justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div>
@@ -264,7 +283,7 @@ const App = () => {
             </>
           )}
 
-          {activeTab === 'students' && (
+          {activeAppTab === 'students' && (
             <>
               <div style={{ display: "flex", justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div>

@@ -23,6 +23,16 @@ const Tabs = ({ activeTab, setActiveTab }) => {
       >
         Estudiantes
       </button>
+      {/*add the new tab for the currency converter*/}
+      <button
+        onClick={() => setActiveTab('currency')}
+        style={{
+          ...buttonStyle,
+          backgroundColor: activeTab === 'currency' ? darkTheme.primary : darkTheme.secondary,
+        }}
+      >
+        Divisas
+      </button>
     </div>
   );
 };
