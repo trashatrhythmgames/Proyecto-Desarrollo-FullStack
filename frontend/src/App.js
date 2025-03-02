@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import LoginForm from './components/LoginForm';
 import CourseList from './components/CourseList';
@@ -32,25 +32,8 @@ const App = () => {
   const [studentPage, setStudentPage] = useState(1);
   const [studentLimit, setStudentLimit] = useState(10);
   const [studentSearch, setStudentSearch] = useState('');
-  
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      setIsLoggedIn(true);
-      fetchData();
-      setActiveTab("courses");
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  function fetchData() {
-    fetchCourses();
-    fetchStudents();
-  }
-
-  const fetchCourses = async () => {
+    const fetchCourses = useCallback(async () => {
     try {
       const response = await axios.get('/api/courses', {
         params: {
@@ -60,7 +43,10 @@ const App = () => {
         },
       });
       // Map _id to id here
-      const coursesWithId = response.data.courses.map(course => ({ ...course, id: course._id }));
+      const coursesWithId = response.data.courses.map((course) => ({
+        ...course,
+        id: course._id,
+      }));
       setCourses(coursesWithId);
       // You can now access total, currentPage and totalPages
       console.log('Total courses:', response.data.total);
@@ -70,9 +56,9 @@ const App = () => {
       setError('Error obteniendo cursos:', error);
       console.error(error);
     }
-  };
+  }, [coursePage, courseLimit, courseSearch]);
 
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     try {
       const response = await axios.get('/api/students', {
         params: {
@@ -82,7 +68,10 @@ const App = () => {
         },
       });
       // Map _id to id here
-      const studentsWithId = response.data.students.map(student => ({ ...student, id: student._id }));
+      const studentsWithId = response.data.students.map((student) => ({
+        ...student,
+        id: student._id,
+      }));
       setStudents(studentsWithId);
       // You can now access total, currentPage and totalPages
       console.log('Total students:', response.data.total);
@@ -92,7 +81,30 @@ const App = () => {
       setError('Error obteniendo estudiantes:', error);
       console.error(error);
     }
-  };
+  }, [studentPage, studentLimit, studentSearch]);
+
+  const fetchData = useCallback(() => {
+    fetchCourses();
+    fetchStudents();
+  }, [fetchCourses, fetchStudents]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      setIsLoggedIn(true);
+      fetchData();
+      setActiveTab("courses");
+    }
+  }, [fetchData]);
+
+  useEffect(() => {
+    fetchCourses();
+  }, [fetchCourses]);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -170,6 +182,9 @@ const App = () => {
 
   //pagination and filter handlers
   const handleCoursePageChange = (newPage) => {
+    if (newPage < 1) {
+      newPage = 1;
+    }
     setCoursePage(newPage);
   };
 
@@ -183,6 +198,9 @@ const App = () => {
     setCoursePage(1);
   };
   const handleStudentPageChange = (newPage) => {
+    if (newPage < 1) {
+      newPage = 1;
+    }
     setStudentPage(newPage);
   };
 
@@ -198,11 +216,11 @@ const App = () => {
   // refetch data when page, limit or search changes
   useEffect(() => {
     fetchCourses();
-  }, [coursePage, courseLimit, courseSearch]);
+  }, [fetchCourses]);
 
   useEffect(() => {
     fetchStudents();
-  }, [studentPage, studentLimit, studentSearch]);
+  }, [fetchStudents]);
 
   return (
     <div style={{ padding: '2rem', color: darkTheme.textPrimary, background: darkTheme.background, minHeight: '100vh' }}>
@@ -211,7 +229,7 @@ const App = () => {
         <LoginForm onLoginSuccess={handleLoginSuccess} />
       ) : (
         <div>
-          <div style={{display: 'flex', justifyContent: "space-between", alignItems: 'center', marginBottom: "1rem"}}>
+          <div style={{ display: 'flex', justifyContent: "space-between", alignItems: 'center', marginBottom: "1rem" }}>
             <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
             <button onClick={handleLogout} style={{ ...buttonStyle, backgroundColor: darkTheme.danger }}>
               Cerrar Sesión
@@ -219,22 +237,22 @@ const App = () => {
           </div>
           {activeTab === 'courses' && (
             <>
-              <div style={{display: "flex", justifyContent: 'space-between', marginBottom: '1rem'}}>
+              <div style={{ display: "flex", justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div>
-                    <label htmlFor="courseSearch">Buscar por Nombre: </label>
-                    <input type="text" id="courseSearch" value={courseSearch} onChange={(e) => handleCourseSearchChange(e.target.value)} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }} />
+                  <label htmlFor="courseSearch">Buscar por Nombre: </label>
+                  <input type="text" id="courseSearch" value={courseSearch} onChange={(e) => handleCourseSearchChange(e.target.value)} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }} />
                 </div>
                 <div>
-                    <label htmlFor="courseLimit">Límite por página:</label>
-                    <select id="courseLimit" value={courseLimit} onChange={(e) => handleCourseLimitChange(parseInt(e.target.value))} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }}>
-                      <option value={5}>5</option>
-                      <option value={10}>10</option>
-                      <option value={20}>20</option>
-                    </select>
+                  <label htmlFor="courseLimit">Límite por página:</label>
+                  <select id="courseLimit" value={courseLimit} onChange={(e) => handleCourseLimitChange(parseInt(e.target.value))} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }}>
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                  </select>
                 </div>
                 <div>
-                    <label htmlFor="coursePage">Página:</label>
-                    <input type="number" id="coursePage" value={coursePage} onChange={(e) => handleCoursePageChange(parseInt(e.target.value))} min="1" style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary, width: '50px' }} />
+                  <label htmlFor="coursePage">Página:</label>
+                  <input type="number" id="coursePage" value={coursePage} onChange={(e) => handleCoursePageChange(parseInt(e.target.value))} min="1" style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary, width: '50px' }} />
                 </div>
               </div>
               <CourseList
@@ -248,22 +266,22 @@ const App = () => {
 
           {activeTab === 'students' && (
             <>
-              <div style={{display: "flex", justifyContent: 'space-between', marginBottom: '1rem'}}>
+              <div style={{ display: "flex", justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div>
-                    <label htmlFor="studentSearch">Buscar por Nombre o Email: </label>
-                    <input type="text" id="studentSearch" value={studentSearch} onChange={(e) => handleStudentSearchChange(e.target.value)} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }} />
+                  <label htmlFor="studentSearch">Buscar por Nombre o Email: </label>
+                  <input type="text" id="studentSearch" value={studentSearch} onChange={(e) => handleStudentSearchChange(e.target.value)} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }} />
                 </div>
                 <div>
-                    <label htmlFor="studentLimit">Límite por página:</label>
-                    <select id="studentLimit" value={studentLimit} onChange={(e) => handleStudentLimitChange(parseInt(e.target.value))} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }}>
-                      <option value={5}>5</option>
-                      <option value={10}>10</option>
-                      <option value={20}>20</option>
-                    </select>
+                  <label htmlFor="studentLimit">Límite por página:</label>
+                  <select id="studentLimit" value={studentLimit} onChange={(e) => handleStudentLimitChange(parseInt(e.target.value))} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }}>
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                  </select>
                 </div>
                 <div>
-                    <label htmlFor="studentPage">Página:</label>
-                    <input type="number" id="studentPage" value={studentPage} onChange={(e) => handleStudentPageChange(parseInt(e.target.value))} min="1" style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary, width: '50px' }} />
+                  <label htmlFor="studentPage">Página:</label>
+                  <input type="number" id="studentPage" value={studentPage} onChange={(e) => handleStudentPageChange(parseInt(e.target.value))} min="1" style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary, width: '50px' }} />
                 </div>
               </div>
               <StudentList

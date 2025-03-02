@@ -2,10 +2,15 @@ const Student = require('../models/Student');
 
 const getAllStudents = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = '' } = req.query;
-    const parsedPage = parseInt(page, 10);
+    let { page = 1, limit = 10, search = '' } = req.query;
+    let parsedPage = parseInt(page, 10);
     const parsedLimit = parseInt(limit, 10);
 
+    // Ensure that the parsedPage is not less than 1
+    if (parsedPage < 1){
+      parsedPage = 1;
+    }
+    
     const skip = (parsedPage - 1) * parsedLimit;
 
     const filter = search
@@ -33,6 +38,7 @@ const getAllStudents = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 const createStudent = async (req, res) => {
   try {
