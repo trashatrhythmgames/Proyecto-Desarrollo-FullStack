@@ -1,13 +1,27 @@
 services:
-  app:
+  backend:
     build:
-      context: .
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - DB_URI=mongodb+srv://gaelandres2005:Kxw5xuxpQddZKaBQ@cluster0.mgibr.mongodb.net/educational_dashboard?retryWrites=true&w=majority&appName=Cluster0 # Change database name
+      - JWT_SECRET=your_jwt_secret_key_here # Change to your own secret
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+      context: ./frontend
       dockerfile: Dockerfile
     ports:
       - "80:80"
-      - "5000:5000"
     depends_on:
-      - mongo
+      - backend
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000 # Change if necessary.
   mongo:
     image: mongo
     ports:
