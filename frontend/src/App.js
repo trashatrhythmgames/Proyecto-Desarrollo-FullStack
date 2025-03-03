@@ -98,12 +98,16 @@ const App = () => {
   }, [fetchData]);
 
   useEffect(() => {
-    fetchCourses();
-  }, [fetchCourses]);
+    if (activeAppTab === 'courses'){
+      fetchCourses();
+    }
+  }, [fetchCourses, activeAppTab]);
 
   useEffect(() => {
-    fetchStudents();
-  }, [fetchStudents]);
+    if (activeAppTab === 'students'){
+      fetchStudents();
+    }
+  }, [fetchStudents, activeAppTab]);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -210,13 +214,6 @@ const App = () => {
     setStudentSearch(newSearch);
     setStudentPage(1);
   };
-  useEffect(() => {
-    fetchCourses();
-  }, [fetchCourses]);
-
-  useEffect(() => {
-    fetchStudents();
-  }, [fetchStudents]);
 
   return (
     <div style={{ padding: '2rem', color: darkTheme.textPrimary, background: darkTheme.background, minHeight: '100vh' }}>
