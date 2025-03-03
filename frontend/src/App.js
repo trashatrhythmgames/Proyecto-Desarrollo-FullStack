@@ -238,20 +238,20 @@ const App = () => {
             <>
               <div style={{ display: "flex", justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div>
-                  <label htmlFor="courseSearch">Buscar por Nombre: </label>
-                  <input type="text" id="courseSearch" value={courseSearch} onChange={(e) => handleCourseSearchChange(e.target.value)} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }} />
+                  <label htmlFor="courseSearchInput">Buscar por Nombre: </label> {/* Changed htmlFor */}
+                  <input type="text" id="courseSearchInput" value={courseSearch} onChange={(e) => handleCourseSearchChange(e.target.value)} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }} /> {/* Changed id */}
                 </div>
                 <div>
-                  <label htmlFor="courseLimit">Límite por página:</label>
-                  <select id="courseLimit" value={courseLimit} onChange={(e) => handleCourseLimitChange(parseInt(e.target.value))} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }}>
+                  <label htmlFor="courseLimitSelect">Límite por página:</label> {/* Changed htmlFor */}
+                  <select id="courseLimitSelect" value={courseLimit} onChange={(e) => handleCourseLimitChange(parseInt(e.target.value))} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }}> {/* Changed id */}
                     <option value={5}>5</option>
                     <option value={10}>10</option>
                     <option value={20}>20</option>
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="coursePage">Página:</label>
-                  <input type="number" id="coursePage" value={coursePage} onChange={(e) => handleCoursePageChange(parseInt(e.target.value))} min="1" style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary, width: '50px' }} />
+                  <label htmlFor="coursePageInput">Página:</label> {/* Changed htmlFor */}
+                  <input type="number" id="coursePageInput" value={coursePage} onChange={(e) => handleCoursePageChange(parseInt(e.target.value))} min="1" style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary, width: '50px' }} /> {/* Changed id */}
                 </div>
               </div>
               <CourseList
@@ -267,20 +267,20 @@ const App = () => {
             <>
               <div style={{ display: "flex", justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div>
-                  <label htmlFor="studentSearch">Buscar por Nombre o Email: </label>
-                  <input type="text" id="studentSearch" value={studentSearch} onChange={(e) => handleStudentSearchChange(e.target.value)} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }} />
+                  <label htmlFor="studentSearchInput">Buscar por Nombre o Email: </label> {/* Changed htmlFor */}
+                  <input type="text" id="studentSearchInput" value={studentSearch} onChange={(e) => handleStudentSearchChange(e.target.value)} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }} /> {/* Changed id */}
                 </div>
                 <div>
-                  <label htmlFor="studentLimit">Límite por página:</label>
-                  <select id="studentLimit" value={studentLimit} onChange={(e) => handleStudentLimitChange(parseInt(e.target.value))} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }}>
+                  <label htmlFor="studentLimitSelect">Límite por página:</label> {/* Changed htmlFor */}
+                  <select id="studentLimitSelect" value={studentLimit} onChange={(e) => handleStudentLimitChange(parseInt(e.target.value))} style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary }}> {/* Changed id */}
                     <option value={5}>5</option>
                     <option value={10}>10</option>
                     <option value={20}>20</option>
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="studentPage">Página:</label>
-                  <input type="number" id="studentPage" value={studentPage} onChange={(e) => handleStudentPageChange(parseInt(e.target.value))} min="1" style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary, width: '50px' }} />
+                  <label htmlFor="studentPageInput">Página:</label> {/* Changed htmlFor */}
+                  <input type="number" id="studentPageInput" value={studentPage} onChange={(e) => handleStudentPageChange(parseInt(e.target.value))} min="1" style={{ background: darkTheme.inputBackground, borderColor: darkTheme.border, color: darkTheme.textPrimary, width: '50px' }} /> {/* Changed id */}
                 </div>
               </div>
               <StudentList
