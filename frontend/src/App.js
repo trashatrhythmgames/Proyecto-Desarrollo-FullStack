@@ -11,6 +11,9 @@ import { darkTheme } from './styles/theme';
 import { buttonStyle } from './styles/styles';
 import CurrencyConverter from './components/CurrencyConverter';
 
+// Set the base URL for all axios requests
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+
 const App = () => {
   const [activeAppTab, setActiveAppTab] = useState('courses');
   const [courses, setCourses] = useState([]);
@@ -105,9 +108,6 @@ const App = () => {
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     fetchData();
-    //Remove call to set activeTab
-    //setActiveTab('courses');
-      //set default to the courses tab.
     setActiveAppTab('courses');
   };
 
@@ -138,14 +138,14 @@ const App = () => {
   };
 
   const handleEditCourse = (course) => {
-    setEditingCourseId(course.id); // Now the id will be defined
+    setEditingCourseId(course.id);
     setEditedCourse({ ...course });
     setIsEditingCourse(true);
   };
 
   const handleUpdateCourse = async (newCourse) => {
     try {
-      await axios.put(`/api/courses/${editingCourseId}`, newCourse); // Now the id will be defined
+      await axios.put(`/api/courses/${editingCourseId}`, newCourse);
       fetchCourses();
       setIsEditingCourse(false);
     } catch (error) {
@@ -226,13 +226,11 @@ const App = () => {
       ) : (
         <div>
           <div style={{ display: 'flex', justifyContent: "space-between", alignItems: 'center', marginBottom: "1rem" }}>
-            {/*change to use the activeAppTab*/}
             <Tabs activeTab={activeAppTab} setActiveTab={setActiveAppTab} />
             <button onClick={handleLogout} style={{ ...buttonStyle, backgroundColor: darkTheme.danger }}>
               Cerrar Sesión
             </button>
           </div>
-          {/*add a new conditional to show or not the new currency converter*/}
           {activeAppTab === 'currency' && (
             <CurrencyConverter />
           )}
